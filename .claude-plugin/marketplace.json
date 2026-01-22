@@ -7,7 +7,10 @@
   "plugins": [
     {
       "name": "ralph-agent",
-      "source": "tmdgusya/roach-loop",
+      "source": {
+        "source": "github",
+        "repo": "tmdgusya/roach-loop"
+      },
       "description": "Implementation agents with planning, building, and loop control workflows using IMPLEMENTATION_PLAN.md with continuous task execution, verification, git workflow, and iteration limits",
       "version": "0.3.0",
       "author": {
