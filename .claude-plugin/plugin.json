@@ -1,0 +1,9 @@
+{
+  "name": "ralph-agent",
+  "version": "0.3.0",
+  "description": "Implementation agents with planning, building, and loop control workflows using IMPLEMENTATION_PLAN.md with continuous task execution, verification, git workflow, and iteration limits",
+  "author": {
+    "name": "Ralph Agent Contributors"
+  },
+  "keywords": ["automation", "implementation", "task-runner", "verification", "planning", "git-workflow", "iteration-control", "loop"]
+}
