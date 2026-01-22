@@ -162,7 +162,7 @@ Utilities in `scripts/`:
 
 If no `- [ ]` or `- [x]` patterns found:
 - Inform user the plan has no tasks
-- Suggest adding tasks or using `/ralph-init` to create a template
+- Suggest adding tasks or using `/ralph-agent:ralph-init` to create a template
 
 ### Malformed Checklist
 

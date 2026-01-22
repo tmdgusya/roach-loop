@@ -1,11 +1,11 @@
 ---
-name: gplan
+name: ralph-agent:gplan
 description: Trigger Geoff's Planner agent to study specs and code, creating/updating IMPLEMENTATION_PLAN.md with prioritized tasks
 argument-hint: [--parallel=N] [--max-passes=N]
 allowed-tools: ["Task"]
 ---
 
-# /gplan Command
+# /ralph-agent:gplan Command
 
 This command invokes Geoff's Planner agent to analyze your specs/ directory and codebase, creating or updating IMPLEMENTATION_PLAN.md with prioritized tasks.
 
@@ -28,13 +28,13 @@ Geoff's Planner will:
 ## Usage
 
 ```
-/gplan
+/ralph-agent:gplan
 ```
 
 With custom parallelism:
 
 ```
-/gplan --parallel=50
+/ralph-agent:gplan --parallel=50
 ```
 
 ## Arguments
@@ -49,7 +49,7 @@ With custom parallelism:
 - `50-100`: Medium projects (50-200 spec files)
 - `100-250`: Large projects (200+ spec files)
 
-**Note:** Planning is typically a one-shot operation. For iterative execution control, use `/gbuild --max-iterations=N`.
+**Note:** Planning is typically a one-shot operation. For iterative execution control, use `/ralph-agent:gbuild --max-iterations=N`.
 
 ## Requirements
 
@@ -86,16 +86,16 @@ Highest Priority Tasks:
 3. [P2] Build REST API endpoints
 
 IMPLEMENTATION_PLAN.md updated.
-Ready for Geoff's Builder: /gbuild
+Ready for Geoff's Builder: /ralph-agent:gbuild
 ```
 
 ## Next Steps
 
-After `/gplan` completes:
+After `/ralph-agent:gplan` completes:
 
 1. **Review the plan:** Check `IMPLEMENTATION_PLAN.md`
-2. **Start building:** Run `/gbuild` to implement tasks
-3. **Iterate:** Re-run `/gplan` after spec changes to update the plan
+2. **Start building:** Run `/ralph-agent:gbuild` to implement tasks
+3. **Iterate:** Re-run `/ralph-agent:gplan` after spec changes to update the plan
 
 ## Stopping Geoff's Planner
 
@@ -107,9 +107,9 @@ To stop while running:
 
 | Command | Purpose |
 |---------|---------|
-| `/gplan` | Create/update IMPLEMENTATION_PLAN.md from specs |
-| `/gbuild` | Implement tasks from IMPLEMENTATION_PLAN.md |
-| `/ralph` | Execute existing IMPLEMENTATION_PLAN.md tasks (no git workflow) |
+| `/ralph-agent:gplan` | Create/update IMPLEMENTATION_PLAN.md from specs |
+| `/ralph-agent:gbuild` | Implement tasks from IMPLEMENTATION_PLAN.md |
+| `/ralph-agent:ralph` | Execute existing IMPLEMENTATION_PLAN.md tasks (no git workflow) |
 | `/plan` | Generic planning command (varies by project) |
 
 ## Best Practices
@@ -125,10 +125,10 @@ To stop while running:
 |-------|----------|
 | `specs/ directory not found` | Create `specs/` directory with your specification files |
 | `specs/ is empty` | Add specification files to `specs/` directory |
-| `No specs/ and no IMPLEMENTATION_PLAN.md` | Create specs/ first, then run `/gplan` |
+| `No specs/ and no IMPLEMENTATION_PLAN.md` | Create specs/ first, then run `/ralph-agent:gplan` |
 
 ## Related Commands
 
-- `/gbuild` - Implement the plan with git workflow
-- `/ralph-init` - Create empty IMPLEMENTATION_PLAN.md template
-- `/ralph` - Execute plan without git workflow
+- `/ralph-agent:gbuild` - Implement the plan with git workflow
+- `/ralph-agent:ralph-init` - Create empty IMPLEMENTATION_PLAN.md template
+- `/ralph-agent:ralph` - Execute plan without git workflow

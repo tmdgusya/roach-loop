@@ -15,10 +15,7 @@
       },
       "keywords": ["automation", "implementation", "task-runner", "verification", "planning", "git-workflow", "iteration-control", "loop"],
       "homepage": "https://github.com/tmdgusya/roach-loop",
-      "repository": {
-        "type": "git",
-        "url": "https://github.com/tmdgusya/roach-loop.git"
-      },
+      "repository": "https://github.com/tmdgusya/roach-loop.git",
       "license": "MIT"
     }
   ]

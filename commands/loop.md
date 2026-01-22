@@ -1,24 +1,24 @@
 ---
-name: loop
+name: ralph-agent:loop
 description: Execute any agent with explicit iteration control, pause prompts, and checkpoint summaries
 argument-hint: <agent-name> [max=N] [pause=true|false] [parallel=M]
 allowed-tools: ["Task"]
 ---
 
-# /loop Command
+# /ralph-agent:loop Command
 
 A powerful wrapper that executes any agent with explicit iteration control, pause prompts between tasks, and detailed checkpoint summaries.
 
 `★ Insight ─────────────────────────────────────`
-**/loop vs Agent Arguments:**
+**/ralph-agent:loop vs Agent Arguments:**
 - Agent `--max-iterations=N`: Simple limit, runs until done
-- `/loop`: Full control with pause prompts, summaries, and resumable sessions
+- `/ralph-agent:loop`: Full control with pause prompts, summaries, and resumable sessions
 - Best for: Careful review between tasks, testing workflows, learning agent behavior
 `─────────────────────────────────────────────────`
 
 ## What This Does
 
-The `/loop` command:
+The `/ralph-agent:loop` command:
 1. Spawns the specified agent (ralph, geoff-builder, etc.)
 2. Monitors agent progress through tasks
 3. Pauses after each task (if `pause=true`)
@@ -28,15 +28,15 @@ The `/loop` command:
 ## Usage
 
 ```
-/loop ralph max=5 pause=true
+/ralph-agent:loop ralph max=5 pause=true
 ```
 
 ```
-/loop geoff-builder max=10 pause=true parallel=50
+/ralph-agent:loop geoff-builder max=10 pause=true parallel=50
 ```
 
 ```
-/loop geoff-builder max=0 pause=false
+/ralph-agent:loop geoff-builder max=0 pause=false
 ```
 
 ## Arguments
@@ -100,7 +100,7 @@ Session Summary:
 - Git commits: 5
 - Latest tag: 0.0.5
 
-To continue: Run /loop geoff-builder again (will resume)
+To continue: Run /ralph-agent:loop geoff-builder again (will resume)
 ```
 
 ## Examples
@@ -108,7 +108,7 @@ To continue: Run /loop geoff-builder again (will resume)
 ### Test Ralph with 3 Tasks
 
 ```
-/loop ralph max=3 pause=true
+/ralph-agent:loop ralph max=3 pause=true
 ```
 
 Process 3 tasks, pause after each for review.
@@ -116,7 +116,7 @@ Process 3 tasks, pause after each for review.
 ### Build with Geoff, Pause Between Each
 
 ```
-/loop geoff-builder max=0 pause=true parallel=50
+/ralph-agent:loop geoff-builder max=0 pause=true parallel=50
 ```
 
 Build ALL tasks, pause after each for review and git verification.
@@ -124,7 +124,7 @@ Build ALL tasks, pause after each for review and git verification.
 ### Quick Batch Build
 
 ```
-/loop geoff-builder max=10 pause=false
+/ralph-agent:loop geoff-builder max=10 pause=false
 ```
 
 Build 10 tasks continuously, then stop for checkpoint.
@@ -132,26 +132,26 @@ Build 10 tasks continuously, then stop for checkpoint.
 ### Full Continuous Build
 
 ```
-/loop geoff-builder max=0 pause=false
+/ralph-agent:loop geoff-builder max=0 pause=false
 ```
 
-Build all tasks without stopping (equivalent to `/gbuild`).
+Build all tasks without stopping (equivalent to `/ralph-agent:gbuild`).
 
 ## Comparison
 
 | Command | Max Iterations | Pause | Git Workflow | Best For |
 |---------|---------------|-------|--------------|----------|
-| `/ralph` | Yes (flag) | No | No | Simple execution |
-| `/gbuild` | Yes (flag) | No | Yes | Git workflow |
-| `/loop ralph` | Yes (arg) | Optional | No | Controlled execution |
-| `/loop geoff-builder` | Yes (arg) | Optional | Yes | Controlled git workflow |
+| `/ralph-agent:ralph` | Yes (flag) | No | No | Simple execution |
+| `/ralph-agent:gbuild` | Yes (flag) | No | Yes | Git workflow |
+| `/ralph-agent:loop ralph` | Yes (arg) | Optional | No | Controlled execution |
+| `/ralph-agent:loop geoff-builder` | Yes (arg) | Optional | Yes | Controlled git workflow |
 
 ## Resuming Sessions
 
 When you stop a loop session (or hit max iterations):
 
 ```
-To continue: Run /loop geoff-builder again
+To continue: Run /ralph-agent:loop geoff-builder again
 ```
 
 The agent will:
@@ -168,7 +168,7 @@ When paused, you can type:
 - `tasks` - List remaining tasks
 - `git` - Show git status (for geoff-builder)
 
-## Stopping /loop
+## Stopping /ralph-agent:loop
 
 To stop at any time:
 - Say "stop", "cancel", or "abort"
@@ -178,7 +178,7 @@ To stop at any time:
 ## Error Handling
 
 If agent fails or errors occur:
-- /loop captures the error
+- /ralph-agent:loop captures the error
 - Displays error context
 - Asks if you want to continue or stop
 - Preserves all completed work
@@ -189,10 +189,10 @@ If agent fails or errors occur:
 
 ```bash
 # 1. Create plan
-/gplan
+/ralph-agent:gplan
 
 # 2. Build with review after each task
-/loop geoff-builder max=0 pause=true
+/ralph-agent:loop geoff-builder max=0 pause=true
 
 # 3. After each task:
 #    - Review git diff
@@ -205,42 +205,42 @@ If agent fails or errors occur:
 
 ```bash
 # Test Ralph with 2 tasks first
-/loop ralph max=2 pause=true
+/ralph-agent:loop ralph max=2 pause=true
 
 # Review output, check if working correctly
 
 # If good, continue with more
-/loop ralph max=5 pause=true
+/ralph-agent:loop ralph max=5 pause=true
 ```
 
 ### Batch Workflow
 
 ```bash
 # Process 10 tasks at a time, review after each batch
-/loop geoff-builder max=10 pause=false
+/ralph-agent:loop geoff-builder max=10 pause=false
 
 # Review git log, tags, tests
 
 # Continue for next batch
-/loop geoff-builder max=10 pause=false
+/ralph-agent:loop geoff-builder max=10 pause=false
 ```
 
 ## Advanced: Combining with Agent Flags
 
-You can combine /loop with agent-specific arguments:
+You can combine /ralph-agent:loop with agent-specific arguments:
 
 ```
-/loop geoff-builder max=5 pause=true parallel=100
+/ralph-agent:loop geoff-builder max=5 pause=true parallel=100
 ```
 
 This:
-- Uses `/loop` for iteration control and pausing
+- Uses `/ralph-agent:loop` for iteration control and pausing
 - Passes `parallel=100` to geoff-builder for analysis
 - Stops after 5 tasks with prompts between each
 
 ## Notes
 
-- `/loop` is a wrapper, not a replacement for direct agent commands
-- For simple "run until done" use the agent directly (`/ralph`, `/gbuild`)
-- Use `/loop` when you need checkpoints, pauses, or resumable sessions
+- `/ralph-agent:loop` is a wrapper, not a replacement for direct agent commands
+- For simple "run until done" use the agent directly (`/ralph-agent:ralph`, `/ralph-agent:gbuild`)
+- Use `/ralph-agent:loop` when you need checkpoints, pauses, or resumable sessions
 - All state is preserved in IMPLEMENTATION_PLAN.md between sessions

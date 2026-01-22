@@ -1,11 +1,11 @@
 ---
-name: gbuild
+name: ralph-agent:gbuild
 description: Trigger Geoff's Builder agent to implement tasks from IMPLEMENTATION_PLAN.md with verification, git workflow, and auto-tagging
 argument-hint: [--parallel=N] [--max-iterations=N]
 allowed-tools: ["Task"]
 ---
 
-# /gbuild Command
+# /ralph-agent:gbuild Command
 
 This command invokes Geoff's Builder agent to implement tasks from IMPLEMENTATION_PLAN.md with continuous verification, git commits, and automatic version tagging.
 
@@ -32,19 +32,19 @@ Geoff's Builder will:
 ## Usage
 
 ```
-/gbuild
+/ralph-agent:gbuild
 ```
 
 With custom parallelism:
 
 ```
-/gbuild --parallel=100
+/ralph-agent:gbuild --parallel=100
 ```
 
 With iteration limit:
 
 ```
-/gbuild --max-iterations=5
+/ralph-agent:gbuild --max-iterations=5
 ```
 
 ## Arguments
@@ -69,7 +69,7 @@ With iteration limit:
 ## Requirements
 
 - **`IMPLEMENTATION_PLAN.md`** must exist with unchecked tasks
-  - Run `/gplan` first if missing
+  - Run `/ralph-agent:gplan` first if missing
 - **`AGENTS.md`** should contain verification commands
 - **Git repository** with remote configured
 
@@ -140,13 +140,13 @@ To stop while running:
 
 | Command | Purpose |
 |---------|---------|
-| `/gplan` | Create/update IMPLEMENTATION_PLAN.md from specs |
-| `/gbuild` | Implement tasks with git workflow + auto-tags |
-| `/ralph` | Execute tasks without git workflow or tagging |
+| `/ralph-agent:gplan` | Create/update IMPLEMENTATION_PLAN.md from specs |
+| `/ralph-agent:gbuild` | Implement tasks with git workflow + auto-tags |
+| `/ralph-agent:ralph` | Execute tasks without git workflow or tagging |
 
 ## Best Practices
 
-1. **Run `/gplan` first:** Ensure plan is up-to-date before building
+1. **Run `/ralph-agent:gplan` first:** Ensure plan is up-to-date before building
 2. **Review first task:** Check what will be implemented
 3. **Keep tests passing:** Geoff's Builder will fix unrelated test failures too
 4. **Monitor git tags:** Each successful task creates a new version tag
@@ -156,7 +156,7 @@ To stop while running:
 
 | Error | Solution |
 |-------|----------|
-| `No IMPLEMENTATION_PLAN.md found` | Run `/gplan` first to create the plan |
+| `No IMPLEMENTATION_PLAN.md found` | Run `/ralph-agent:gplan` first to create the plan |
 | `No unchecked tasks in plan` | All tasks are complete! |
 | `No verification commands in AGENTS.md` | Add verification commands to AGENTS.md |
 | `Tests failing` | Geoff's Builder will fix and re-run |
@@ -175,21 +175,21 @@ Geoff's Builder follows these principles:
 
 ## Related Commands
 
-- `/gplan` - Create/update the implementation plan
-- `/ralph` - Execute plan without git workflow
-- `/ralph-init` - Create empty IMPLEMENTATION_PLAN.md template
+- `/ralph-agent:gplan` - Create/update the implementation plan
+- `/ralph-agent:ralph` - Execute plan without git workflow
+- `/ralph-agent:ralph-init` - Create empty IMPLEMENTATION_PLAN.md template
 
 ## Workflow Example
 
 ```bash
 # 1. Create/update plan from specs
-/gplan --parallel=50
+/ralph-agent:gplan --parallel=50
 
 # 2. Review the plan
 cat IMPLEMENTATION_PLAN.md
 
 # 3. Implement with full git workflow
-/gbuild --parallel=100
+/ralph-agent:gbuild --parallel=100
 
 # 4. Check the results
 git log --oneline

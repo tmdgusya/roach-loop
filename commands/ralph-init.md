@@ -1,11 +1,11 @@
 ---
-name: ralph-init
+name: ralph-agent:ralph-init
 description: Create a new IMPLEMENTATION_PLAN.md template file with standard sections
 argument-hint: [no arguments]
 allowed-tools: ["Write"]
 ---
 
-# /ralph-init Command
+# /ralph-agent:ralph-init Command
 
 This command creates a template IMPLEMENTATION_PLAN.md file in the current directory.
 
@@ -21,7 +21,7 @@ Creates a standard implementation plan template with:
 ## Usage
 
 ```
-/ralph-init
+/ralph-agent:ralph-init
 ```
 
 This creates IMPLEMENTATION_PLAN.md in the current working directory.
@@ -58,7 +58,7 @@ Commands to verify implementation (also add these to AGENTS.md):
 
 1. Edit the plan to add your specific tasks
 2. Ensure AGENTS.md has verification commands
-3. Run `/ralph` to start implementation
+3. Run `/ralph-agent:ralph` to start implementation
 
 ## Overwriting
 

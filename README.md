@@ -8,13 +8,13 @@ This plugin provides two complementary workflows for automated implementation:
 
 ### Geoff's Iterative Planning & Building
 For projects with specification files in `specs/` directory:
-- **Geoff's Planner** (`/gplan`): Analyzes specs and code, creates prioritized `IMPLEMENTATION_PLAN.md`
-- **Geoff's Builder** (`/gbuild`): Implements tasks with automatic git commits, pushes, and version tags
+- **Geoff's Planner** (`/ralph-agent:gplan`): Analyzes specs and code, creates prioritized `IMPLEMENTATION_PLAN.md`
+- **Geoff's Builder** (`/ralph-agent:gbuild`): Implements tasks with automatic git commits, pushes, and version tags
 - Best for: Spec-driven projects requiring git workflow and version tracking
 
 ### Ralph's Direct Execution
 For projects with manual or existing implementation plans:
-- **Ralph** (`/ralph`): Executes tasks from `IMPLEMENTATION_PLAN.md` sequentially
+- **Ralph** (`/ralph-agent:ralph`): Executes tasks from `IMPLEMENTATION_PLAN.md` sequentially
 - Best for: Simple task lists where you manage your own git workflow
 
 ## Features
@@ -68,34 +68,34 @@ cp -r ralph-agent /path/to/your-project/.claude-plugin/
 **Optional:** Copy `loop.py` script for external iteration control:
 
 ```bash
-cp ralph-agent/loop.py /path/to/your-project/
+cp ralph-agent/ralph-agent:loop.py /path/to/your-project/
 chmod +x loop.py
 ```
 
 ### Method 3: Global Manual Installation
 
 ```bash
-cp -r ralph-agent ~/.claude/plugins/ralph-agent
+cp -r ralph-agent ~/.claude/plugins/ralph-agent:ralph-agent
 ```
 
 **Optional:** Install `loop.py` globally:
 
 ```bash
-sudo cp ralph-agent/loop.py /usr/local/bin/ralph-loop
+sudo cp ralph-agent/ralph-agent:loop.py /usr/local/bin/ralph-agent:ralph-loop
 # Or create a symlink
-ln -s ~/.claude/plugins/ralph-agent/loop.py ~/bin/ralph-loop
+ln -s ~/.claude/plugins/ralph-agent:ralph-agent/ralph-agent:loop.py ~/bin/ralph-agent:ralph-loop
 ```
 
 ### Method 4: Command-Line Flag
 
 ```bash
-cc --plugin-dir /path/to/ralph-agent
+cc --plugin-dir /path/to/ralph-agent:ralph-agent
 ```
 
 **Note:** The `loop.py` script requires access to the ralph-agent plugin. If using global installation, use `--plugin-dir` to specify the plugin path:
 
 ```bash
-./loop.py ralph 10 --plugin-dir ~/.claude/plugins/ralph-agent
+./ralph-agent:loop.py ralph 10 --plugin-dir ~/.claude/plugins/ralph-agent:ralph-agent
 ```
 
 ## Quick Start
@@ -131,7 +131,7 @@ Create specification files in `specs/`:
 #### 3. Generate Implementation Plan
 
 ```bash
-/gplan
+/ralph-agent:gplan
 ```
 
 This analyzes your specs and creates `IMPLEMENTATION_PLAN.md`.
@@ -139,7 +139,7 @@ This analyzes your specs and creates `IMPLEMENTATION_PLAN.md`.
 #### 4. Build with Git Workflow
 
 ```bash
-/gbuild
+/ralph-agent:gbuild
 ```
 
 Geoff's Builder will:
@@ -153,7 +153,7 @@ Geoff's Builder will:
 #### 1. Create an Implementation Plan
 
 ```bash
-/ralph-init
+/ralph-agent:ralph-init
 ```
 
 This creates `IMPLEMENTATION_PLAN.md` with a template.
@@ -185,27 +185,27 @@ Create or edit `AGENTS.md` with verification commands:
 #### 4. Start Ralph
 
 ```bash
-/ralph
+/ralph-agent:ralph
 ```
 
 Ralph will work through all tasks continuously until complete.
 
-**Note:** Ralph does NOT handle git workflow. Commit manually or use `/gbuild`.
+**Note:** Ralph does NOT handle git workflow. Commit manually or use `/ralph-agent:gbuild`.
 
 ## Commands
 
-### `/gplan` - Geoff's Planner
+### `/ralph-agent:gplan` - Geoff's Planner
 
 Create or update `IMPLEMENTATION_PLAN.md` by analyzing your `specs/` directory.
 
 **Usage:**
 ```
-/gplan
+/ralph-agent:gplan
 ```
 
 With custom parallelism:
 ```
-/gplan --parallel=50
+/ralph-agent:gplan --parallel=50
 ```
 
 **What happens:**
@@ -218,18 +218,18 @@ With custom parallelism:
 **Requirements:**
 - `specs/` directory must exist with specification files
 
-### `/gbuild` - Geoff's Builder
+### `/ralph-agent:gbuild` - Geoff's Builder
 
 Implement tasks from `IMPLEMENTATION_PLAN.md` with git workflow and auto-tagging.
 
 **Usage:**
 ```
-/gbuild
+/ralph-agent:gbuild
 ```
 
 With custom parallelism:
 ```
-/gbuild --parallel=100
+/ralph-agent:gbuild --parallel=100
 ```
 
 **What happens:**
@@ -246,13 +246,13 @@ With custom parallelism:
 - `IMPLEMENTATION_PLAN.md` must exist
 - Git repository with remote configured
 
-### `/ralph`
+### `/ralph-agent:ralph`
 
 Start Ralph to work through tasks in `IMPLEMENTATION_PLAN.md`.
 
 **Usage:**
 ```
-/ralph
+/ralph-agent:ralph
 ```
 
 **What happens:**
@@ -263,15 +263,15 @@ Start Ralph to work through tasks in `IMPLEMENTATION_PLAN.md`.
 5. Marks task complete when verification passes
 6. Continues to the next task automatically
 
-**Note:** Ralph does NOT handle git workflow. Use `/gbuild` for automatic commits/tags.
+**Note:** Ralph does NOT handle git workflow. Use `/ralph-agent:gbuild` for automatic commits/tags.
 
-### `/ralph-init`
+### `/ralph-agent:ralph-init`
 
 Create a new `IMPLEMENTATION_PLAN.md` template file.
 
 **Usage:**
 ```
-/ralph-init
+/ralph-agent:ralph-init
 ```
 
 Creates a template with:
@@ -281,15 +281,15 @@ Creates a template with:
 - Verification section
 - Notes section
 
-### `/loop` - Loop Wrapper Command
+### `/ralph-agent:loop` - Loop Wrapper Command
 
 Execute any agent with explicit iteration control, pause prompts, and checkpoint summaries.
 
 **Usage:**
 ```
-/loop ralph max=5 pause=true
-/loop geoff-builder max=10 pause=true parallel=50
-/loop geoff-builder max=0 pause=false
+/ralph-agent:loop ralph max=5 pause=true
+/ralph-agent:loop geoff-builder max=10 pause=true parallel=50
+/ralph-agent:loop geoff-builder max=0 pause=false
 ```
 
 **Features:**
@@ -310,23 +310,23 @@ All agents support iteration limits for controlled execution:
 
 ```bash
 # Limit to 5 tasks
-/ralph --max-iterations=5
+/ralph-agent:ralph --max-iterations=5
 
 # Limit to 10 tasks with git workflow
-/gbuild --max-iterations=10
+/ralph-agent:gbuild --max-iterations=10
 
 # Unlimited (default)
-/gbuild
+/ralph-agent:gbuild
 ```
 
-### `/loop` Command (Full Control)
+### `/ralph-agent:loop` Command (Full Control)
 
 ```bash
 # Pause between tasks for review
-/loop ralph max=5 pause=true
+/ralph-agent:loop ralph max=5 pause=true
 
 # Continuous batch execution
-/loop geoff-builder max=20 pause=false
+/ralph-agent:loop geoff-builder max=20 pause=false
 ```
 
 ### External `loop.py` Script (Production)
@@ -339,32 +339,32 @@ The `loop.py` script is included in the ralph-agent plugin. To use it:
 
 ```bash
 # Option 1: Copy to your project
-cp ralph-agent/loop.py ./
+cp ralph-agent/ralph-agent:loop.py ./
 
 # Option 2: Install globally
-sudo cp ralph-agent/loop.py /usr/local/bin/ralph-loop
+sudo cp ralph-agent/ralph-agent:loop.py /usr/local/bin/ralph-agent:ralph-loop
 
 # Option 3: Create symlink
-ln -s /path/to/ralph-agent/loop.py ~/bin/ralph-loop
+ln -s /path/to/ralph-agent:ralph-agent/ralph-agent:loop.py ~/bin/ralph-agent:ralph-loop
 ```
 
 **Usage:**
 
 ```bash
 # Ralph unlimited
-./loop.py ralph
+./ralph-agent:loop.py ralph
 
 # Ralph max 10 iterations
-./loop.py ralph 10
+./ralph-agent:loop.py ralph 10
 
 # Geoff Builder unlimited with custom parallelism
-./loop.py gbuild 0 --parallel 100
+./ralph-agent:loop.py gbuild 0 --parallel 100
 
 # Geoff Builder max 50 iterations
-./loop.py gbuild 50
+./ralph-agent:loop.py gbuild 50
 
 # With custom plugin path
-./loop.py ralph 20 --plugin-dir /path/to/ralph-agent
+./ralph-agent:loop.py ralph 20 --plugin-dir /path/to/ralph-agent:ralph-agent
 ```
 
 **Features:**
@@ -379,7 +379,7 @@ ln -s /path/to/ralph-agent/loop.py ~/bin/ralph-loop
 | Method | Session | Max Iterations | Best For |
 |--------|---------|---------------|----------|
 | Agent flags | Internal | Yes (`--max-iterations`) | Simple limits |
-| `/loop` command | Internal | Yes + pause prompts | Interactive review |
+| `/ralph-agent:loop` command | Internal | Yes + pause prompts | Interactive review |
 | `loop.py` script | External | Yes + true infinite | Production, long-running |
 
 ## File Format
@@ -468,7 +468,7 @@ For projects with specification files in `specs/` directory:
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                             │
 │  ┌─────────────┐      ┌─────────────┐      ┌─────────────────────────┐    │
-│  │   specs/    │─────▶│    /gplan   │─────▶│ IMPLEMENTATION_PLAN.md │    │
+│  │   specs/    │─────▶│    /ralph-agent:gplan   │─────▶│ IMPLEMENTATION_PLAN.md │    │
 │  │  directory  │      │  (planner)  │      │   (prioritized tasks)   │    │
 │  └─────────────┘      └─────────────┘      └───────────┬─────────────┘    │
 │         │                                            │ review?             │
@@ -479,14 +479,14 @@ For projects with specification files in `specs/` directory:
 │         │                  │                                              │
 │         │                  ▼                                              │
 │         │           ┌─────────────┐      ┌─────────────────────────┐    │
-│         │           │   /gbuild   │─────▶│  Git commits + tags     │    │
+│         │           │   /ralph-agent:gbuild   │─────▶│  Git commits + tags     │    │
 │         └──────────▶│  (builder)  │      │  (0.0.0 → 0.0.1 → ...)  │    │
 │                     └─────────────┘      └───────────┬─────────────┘    │
 │                                                           │               │
 │  Specs change? ──────────────────────────────────────────┘               │
 │       │                                                                   │
 │       ▼                                                                   │
-│   Re-run /gplan                                                           │
+│   Re-run /ralph-agent:gplan                                                           │
 │   (updates plan with gaps)                                                │
 │                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
@@ -496,7 +496,7 @@ Key Features:
 • Auto-generates IMPLEMENTATION_PLAN.md from specifications
 • Git workflow: commit → push → auto-tag (each task = new version)
 • Continuous: repeats until all tasks complete
-• Iteration control: --max-iterations=N, /loop command, or loop.py script
+• Iteration control: --max-iterations=N, /ralph-agent:loop command, or loop.py script
 ```
 
 ### Workflow 2: Ralph's Direct Execution
@@ -509,8 +509,8 @@ For projects with manual or existing implementation plans:
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                             │
 │  ┌─────────────────┐      ┌─────────────┐      ┌───────────────────────┐  │
-│  │ Manual plan OR  │─────▶│ /ralph-init │─────▶│ IMPLEMENTATION_PLAN.md│  │
-│  │ /ralph-init     │      │ (optional)  │      │  (you create tasks)   │  │
+│  │ Manual plan OR  │─────▶│ /ralph-agent:ralph-init │─────▶│ IMPLEMENTATION_PLAN.md│  │
+│  │ /ralph-agent:ralph-init     │      │ (optional)  │      │  (you create tasks)   │  │
 │  └─────────────────┘      └─────────────┘      └───────────┬───────────┘  │
 │                                                     │                     │
 │                              ┌─────────────┐        │                     │
@@ -519,7 +519,7 @@ For projects with manual or existing implementation plans:
 │                              └──────┬──────┘                              │
 │                                     │                                      │
 │                              ┌──────▼──────┐                              │
-│                              │   /ralph    │                              │
+│                              │   /ralph-agent:ralph    │                              │
 │                              │  (executor) │                              │
 │                              └──────┬──────┘                              │
 │                                     │                                      │
@@ -531,22 +531,22 @@ For projects with manual or existing implementation plans:
 └─────────────────────────────────────────────────────────────────────────────┘
 
 Key Features:
-• Simple: create plan → run /ralph
+• Simple: create plan → run /ralph-agent:ralph
 • No git workflow (you handle commits)
 • No specs/ directory required
 • Continuous: repeats until all tasks complete
-• Iteration control: --max-iterations=N, /loop command, or loop.py script
+• Iteration control: --max-iterations=N, /ralph-agent:loop command, or loop.py script
 ```
 
 ### Choosing Your Workflow
 
 | Use Case | Recommended Workflow | Commands |
 |----------|---------------------|----------|
-| I have `specs/` with feature specifications | Geoff's Iterative | `/gplan` → `/gbuild` |
-| I want automatic git commits + version tags | Geoff's Iterative | `/gplan` → `/gbuild` |
-| I have a simple task list | Ralph's Direct | `/ralph-init` → `/ralph` |
-| I manage my own git workflow | Ralph's Direct | `/ralph` |
-| I need to update plan after spec changes | Geoff's Iterative | `/gplan` (re-run) |
+| I have `specs/` with feature specifications | Geoff's Iterative | `/ralph-agent:gplan` → `/ralph-agent:gbuild` |
+| I want automatic git commits + version tags | Geoff's Iterative | `/ralph-agent:gplan` → `/ralph-agent:gbuild` |
+| I have a simple task list | Ralph's Direct | `/ralph-agent:ralph-init` → `/ralph-agent:ralph` |
+| I manage my own git workflow | Ralph's Direct | `/ralph-agent:ralph` |
+| I need to update plan after spec changes | Geoff's Iterative | `/ralph-agent:gplan` (re-run) |
 
 ### Comparison
 
@@ -557,7 +557,7 @@ Key Features:
 | Planning | Automatic from specs | Manual |
 | Version tags | Yes (0.0.0, 0.0.1, ...) | No |
 | Parallel analysis | Yes (configurable) | No |
-| Iteration control | `--max-iterations`, `/loop`, `loop.py` | `--max-iterations`, `/loop`, `loop.py` |
+| Iteration control | `--max-iterations`, `/ralph-agent:loop`, `loop.py` | `--max-iterations`, `/ralph-agent:loop`, `loop.py` |
 | Best for | Spec-driven projects | Quick task lists |
 
 ## Stopping Ralph
@@ -587,13 +587,13 @@ Ralph will:
 
 ```bash
 # Create initial plan
-/ralph-init
+/ralph-agent:ralph-init
 
 # Edit the plan with your tasks
 # Edit AGENTS.md with verification commands
 
 # Start Ralph
-/ralph
+/ralph-agent:ralph
 
 # Ralph output:
 ✓ Task completed: Task 1: Create database models
@@ -631,16 +631,16 @@ Implementation agent that executes tasks with git workflow (add/commit/push/tag)
 
 ### Commands
 
-#### `/ralph`
+#### `/ralph-agent:ralph`
 Start Ralph to execute tasks sequentially without git workflow.
 
-#### `/ralph-init`
+#### `/ralph-agent:ralph-init`
 Create an empty `IMPLEMENTATION_PLAN.md` template file.
 
-#### `/gplan`
+#### `/ralph-agent:gplan`
 Trigger Geoff's Planner to analyze specs and generate/update implementation plan.
 
-#### `/gbuild`
+#### `/ralph-agent:gbuild`
 Trigger Geoff's Builder to implement tasks with full git workflow and auto-tagging.
 
 ### Skill: `implementation-plan`
@@ -661,11 +661,11 @@ ralph-agent/
 │   ├── geoff-planner.md     # Geoff's Planner agent
 │   └── geoff-builder.md     # Geoff's Builder agent
 ├── commands/
-│   ├── ralph.md             # /ralph command
-│   ├── ralph-init.md        # /ralph-init command
-│   ├── gplan.md             # /gplan command
-│   ├── gbuild.md            # /gbuild command
-│   └── loop.md              # /loop wrapper command
+│   ├── ralph.md             # /ralph-agent:ralph command
+│   ├── ralph-init.md        # /ralph-agent:ralph-init command
+│   ├── gplan.md             # /ralph-agent:gplan command
+│   ├── gbuild.md            # /ralph-agent:gbuild command
+│   └── loop.md              # /ralph-agent:loop wrapper command
 ├── skills/
 │   └── implementation-plan/
 │       ├── SKILL.md         # Main skill file
@@ -705,7 +705,7 @@ ralph-agent/
 ## Troubleshooting
 
 ### "No IMPLEMENTATION_PLAN.md found"
-Run `/ralph-init` to create a template plan file.
+Run `/ralph-agent:ralph-init` to create a template plan file.
 
 ### "No verification commands found"
 Create `AGENTS.md` with verification commands.
@@ -714,7 +714,7 @@ Create `AGENTS.md` with verification commands.
 Ralph will automatically fix and retry. If it fails repeatedly, Ralph will ask for guidance.
 
 ### Ralph stopped unexpectedly
-Ralph saves progress after each task. Just run `/ralph` again to continue.
+Ralph saves progress after each task. Just run `/ralph-agent:ralph` again to continue.
 
 ## Publishing & Distribution
 
@@ -778,13 +778,13 @@ To publish updates to this plugin:
 ```
 roach-loop/                              # GitHub repository root
 ├── .claude-plugin/
-│   └── marketplace.json                 # Marketplace catalog (source: ./ralph-agent)
+│   └── marketplace.json                 # Marketplace catalog (source: ./ralph-agent:ralph-agent)
 ├── ralph-agent/                         # Plugin directory
 │   ├── .claude-plugin/
 │   │   ├── plugin.json                  # Plugin manifest
 │   │   └── marketplace.json             # (backup/reference)
 │   ├── agents/                          # ralph, geoff-planner, geoff-builder
-│   ├── commands/                        # /ralph, /gplan, /gbuild, etc.
+│   ├── commands/                        # /ralph-agent:ralph, /ralph-agent:gplan, /ralph-agent:gbuild, etc.
 │   ├── skills/                          # implementation-plan skill
 │   ├── loop.py                          # External loop controller
 │   └── README.md                        # This file
@@ -831,7 +831,7 @@ Claude Code uses a **decentralized marketplace model**:
 **Alternative - Clone and install locally:**
 ```bash
 git clone https://github.com/tmdgusya/roach-loop.git
-/plugin install ./roach-loop/ralph-agent
+/plugin install ./roach-loop/ralph-agent:ralph-agent
 ```
 
 ## License

@@ -1,11 +1,11 @@
 ---
-name: ralph
+name: ralph-agent:ralph
 description: Start Ralph agent to work through IMPLEMENTATION_PLAN.md tasks continuously
 argument-hint: [--max-iterations=N]
 allowed-tools: ["Task"]
 ---
 
-# /ralph Command
+# /ralph-agent:ralph Command
 
 This command invokes the Ralph agent to work through tasks in IMPLEMENTATION_PLAN.md.
 
@@ -22,12 +22,12 @@ Ralph will:
 
 Simply invoke this command:
 ```
-/ralph
+/ralph-agent:ralph
 ```
 
 With iteration limit:
 ```
-/ralph --max-iterations=3
+/ralph-agent:ralph --max-iterations=3
 ```
 
 Ralph will report progress as it works through each task.
@@ -46,7 +46,7 @@ Ralph will report progress as it works through each task.
 ## Requirements
 
 - **IMPLEMENTATION_PLAN.md** must exist in the current directory
-- Use `/ralph-init` if you need to create a template plan file
+- Use `/ralph-agent:ralph-init` if you need to create a template plan file
 - **AGENTS.md** should contain verification commands (optional but recommended)
 
 ## Stopping Ralph
