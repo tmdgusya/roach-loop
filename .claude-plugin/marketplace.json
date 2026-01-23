@@ -9,11 +9,20 @@
       "name": "ralph-agent",
       "source": "./ralph-agent",
       "description": "Implementation agents with planning, building, and loop control workflows using IMPLEMENTATION_PLAN.md with continuous task execution, verification, git workflow, and iteration limits",
-      "version": "0.3.0",
+      "version": "0.5.0",
       "author": {
         "name": "tmdgusya"
       },
-      "keywords": ["automation", "implementation", "task-runner", "verification", "planning", "git-workflow", "iteration-control", "loop"],
+      "keywords": [
+        "automation",
+        "implementation",
+        "task-runner",
+        "verification",
+        "planning",
+        "git-workflow",
+        "iteration-control",
+        "loop"
+      ],
       "homepage": "https://github.com/tmdgusya/roach-loop",
       "repository": "https://github.com/tmdgusya/roach-loop.git",
       "license": "MIT",
