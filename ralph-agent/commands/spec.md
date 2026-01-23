@@ -1,4 +1,5 @@
 ---
+name: ralph-agent:spec
 description: Create a new specification through interactive questioning
 argument-hint: Optional feature description to start with
 ---
