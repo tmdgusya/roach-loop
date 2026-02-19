@@ -64,5 +64,22 @@ if [ "$HARNESS_LOOP_ENABLED" = "true" ]; then
   fi
 fi
 
+# --- Verification Result Tracking (Bash tool) ---
+if [ "$TOOL_NAME" = "Bash" ] && [ -d "$HARNESS_STATE_DIR" ]; then
+  COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // ""')
+  # PostToolUse means the command succeeded (exit 0)
+
+  # Track test results
+  if echo "$COMMAND" | grep -qE '(pytest|npm test|npm run test|go test|jest|vitest|cargo test|make test)'; then
+    write_state ".verification_status.tests_passed" 'true'
+    write_state ".verification_status.last_verified_at" "\"$(date -u +"%Y-%m-%dT%H:%M:%SZ")\""
+  fi
+
+  # Track lint results
+  if echo "$COMMAND" | grep -qE '(ruff|eslint|flake8|pylint|npm run lint|clippy|golangci-lint)'; then
+    write_state ".verification_status.lint_passed" 'true'
+  fi
+fi
+
 # No output needed for normal operations
 exit 0
