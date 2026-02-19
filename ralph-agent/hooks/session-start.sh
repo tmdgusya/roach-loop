@@ -33,6 +33,14 @@ fi
 export HARNESS_STATE_DIR="${CWD}/.harness"
 init_harness_state
 
+# Per-session state reset:
+# - edit-tracker: counts are per-session; reset prevents cross-session false positives
+# - verification_status: stop-checklist must see fresh evidence each session
+# On "resume": preserve state so in-flight work continues correctly
+if [ "$SOURCE" != "resume" ]; then
+  reset_session_state
+fi
+
 # --- Build Context ---
 
 CONTEXT=""
@@ -45,8 +53,12 @@ if [ -d "$CWD" ]; then
     -not -path '*/.harness/*' \
     -not -path '*/__pycache__/*' \
     -not -path '*/.venv/*' \
+    -not -path '*/.ruff_cache/*' \
+    -not -path '*/.pytest_cache/*' \
+    -not -path '*/.cursor/*' \
     -not -name '*.pyc' \
-    2>/dev/null | head -100 | sed "s|$CWD/||" | sort)
+    -not -name '.coverage' \
+    2>/dev/null | head -100 | sed "s|$CWD/||" | sort || true)
 
   CONTEXT+="## Project Structure
 \`\`\`
