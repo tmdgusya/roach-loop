@@ -66,6 +66,25 @@ reset_edit_tracker() {
   echo '{}' > "$HARNESS_STATE_DIR/edit-tracker.json"
 }
 
+reset_session_state() {
+  # Reset edit-tracker so loop detection is per-session, not cumulative.
+  # A file edited N times last session should not trigger loop detection
+  # on the first edit of a new session.
+  echo '{}' > "$HARNESS_STATE_DIR/edit-tracker.json"
+
+  # Reset verification_status so the stop checklist requires fresh evidence
+  # each session. Stale "tests_passed=true" from a prior session should not
+  # count as proof for the current session.
+  local tmp="$HARNESS_STATE_DIR/state.json.tmp"
+  jq '
+    .verification_status.tests_run = false |
+    .verification_status.tests_passed = false |
+    .verification_status.lint_run = false |
+    .verification_status.lint_passed = false |
+    .verification_status.last_verified_at = null
+  ' "$HARNESS_STATE_DIR/state.json" > "$tmp" && mv "$tmp" "$HARNESS_STATE_DIR/state.json"
+}
+
 append_trace() {
   local tool_name="$1" tool_input="$2" result="$3"
   local timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
