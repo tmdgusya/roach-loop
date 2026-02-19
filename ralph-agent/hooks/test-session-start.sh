@@ -5,7 +5,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TMPDIR=$(mktemp -d)
 trap "rm -rf $TMPDIR" EXIT
 
-# Create a fake project structure
+# Create a fake project structure with AGENTS.md for discovery
 mkdir -p "$TMPDIR/src" "$TMPDIR/tests" "$TMPDIR/.harness"
 echo '{}' > "$TMPDIR/.harness/state.json"
 echo '{}' > "$TMPDIR/.harness/edit-tracker.json"
@@ -52,6 +52,28 @@ assert_contains "contains task status" "Task 1" "$OUTPUT"
 STATE_PHASE=$(jq -r '.phase' "$TMPDIR/.harness/state.json")
 assert_contains "state phase updated" "executing" "$STATE_PHASE"
 
+# Verify discovered_verification_commands written to state
+echo ""
+echo "=== Test: discovery writes to state ==="
+
+DISC_CMDS=$(jq -r '.discovered_verification_commands' "$TMPDIR/.harness/state.json")
+if echo "$DISC_CMDS" | grep -q "pytest"; then
+  echo "  PASS: discovered_verification_commands written to state (contains pytest)"
+  PASS=$((PASS + 1))
+else
+  echo "  FAIL: discovered_verification_commands not written to state (got: $DISC_CMDS)"
+  FAIL=$((FAIL + 1))
+fi
+
+HAS_INFRA=$(jq -r '.has_test_infra' "$TMPDIR/.harness/state.json")
+if [ "$HAS_INFRA" = "true" ]; then
+  echo "  PASS: has_test_infra=true written to state"
+  PASS=$((PASS + 1))
+else
+  echo "  FAIL: has_test_infra should be true (got: $HAS_INFRA)"
+  FAIL=$((FAIL + 1))
+fi
+
 echo ""
 echo "=== Test: startup resets edit-tracker and verification_status ==="
 
@@ -76,8 +98,6 @@ else
 fi
 
 # Assert verification_status.tests_passed is false
-# Note: use 'if . == false then "false" else "other" end' to avoid jq // operator
-# treating false as an alternative (false // "missing" would yield "missing" in jq)
 TESTS_PASSED=$(jq -r 'if .verification_status.tests_passed == false then "false" else "not-false" end' "$TMPDIR/.harness/state.json")
 if [ "$TESTS_PASSED" = "false" ]; then
   echo "  PASS: startup resets verification_status.tests_passed to false"

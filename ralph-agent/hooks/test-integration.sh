@@ -90,11 +90,17 @@ OUTPUT=$(echo "$EDIT_INPUT" | bash "$SCRIPT_DIR/post-tool-use.sh" 2>/dev/null)
 assert_contains "loop warning" "reconsider" "$OUTPUT"
 echo ""
 
-# --- Phase 4: Stop (checklist blocks) ---
+# --- Phase 4: Stop (always challenge once) ---
 echo "Phase 4: Stop Checklist"
 
 STOP_INPUT=$(jq -n '{
   stop_hook_active: false,
+  last_assistant_message: "Done!",
+  cwd: "'"$TMPDIR"'",
+  hook_event_name: "Stop"
+}')
+STOP_ACTIVE_INPUT=$(jq -n '{
+  stop_hook_active: true,
   last_assistant_message: "Done!",
   cwd: "'"$TMPDIR"'",
   hook_event_name: "Stop"
@@ -104,7 +110,7 @@ set +e
 echo "$STOP_INPUT" | bash "$SCRIPT_DIR/stop-checklist.sh" > /dev/null 2>/dev/null
 EXIT_CODE=$?
 set -e
-assert_eq "stop blocked (no verification)" "2" "$EXIT_CODE"
+assert_eq "stop challenged first attempt (no verification)" "2" "$EXIT_CODE"
 
 # Simulate verification passing
 jq '.verification_status.tests_run = true | .verification_status.tests_passed = true | .verification_status.lint_run = true | .verification_status.lint_passed = true' \
@@ -114,11 +120,19 @@ jq '.verification_status.tests_run = true | .verification_status.tests_passed = 
 # Mark all tasks done (macOS-compatible sed)
 sed -i '' 's/- \[ \]/- [x]/' "$TMPDIR/IMPLEMENTATION_PLAN.md"
 
+# First attempt still challenges even when verified (always challenge once)
 set +e
 echo "$STOP_INPUT" | bash "$SCRIPT_DIR/stop-checklist.sh" > /dev/null 2>/dev/null
 EXIT_CODE=$?
 set -e
-assert_eq "stop allowed (verified + done)" "0" "$EXIT_CODE"
+assert_eq "stop challenged even when verified (first attempt)" "2" "$EXIT_CODE"
+
+# Second attempt with stop_hook_active=true passes through
+set +e
+echo "$STOP_ACTIVE_INPUT" | bash "$SCRIPT_DIR/stop-checklist.sh" > /dev/null 2>/dev/null
+EXIT_CODE=$?
+set -e
+assert_eq "stop allowed on second attempt (stop_hook_active=true)" "0" "$EXIT_CODE"
 echo ""
 
 # --- Phase 5: PreCompact ---

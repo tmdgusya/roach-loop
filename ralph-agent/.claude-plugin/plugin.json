@@ -1,6 +1,6 @@
 {
   "name": "ralph-agent",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Deterministic scaffolding harness for implementation agents. Uses Claude Code hooks as middleware for context injection, loop detection, pre-completion checklist, and trace analysis.",
   "author": {
     "name": "Ralph Agent Contributors"

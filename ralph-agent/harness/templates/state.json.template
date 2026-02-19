@@ -13,6 +13,8 @@
     "lint_passed": false,
     "last_verified_at": null
   },
+  "discovered_verification_commands": [],
+  "has_test_infra": false,
   "tdd_phase": null,
   "context_injected": false,
   "last_compacted_at": null

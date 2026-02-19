@@ -229,6 +229,16 @@ Use [Claude Code Agent Teams](https://code.claude.com/docs/en/agent-teams) when 
    - Identify which specs have tests and which don't
    - Note test framework used (pytest, jest, etc.)
 
+8. **Discover verification commands from project config:**
+   - Check for AGENTS.md bullet-style backtick commands
+   - Check package.json scripts.test / scripts.lint (ignore npm-init default)
+   - Check for pytest.ini / setup.cfg / pyproject.toml [tool.pytest] → `pytest tests/`
+   - Check for *_test.go files → `go test ./...`
+   - Check for Cargo.toml → `cargo test`
+   - Check for Makefile `test:` target → `make test`
+   - Check for ruff.toml / pyproject.toml [tool.ruff] → `ruff check .`
+   - These discovered commands must appear in the plan's `## Verification` section
+
 ### Phase 3: Gap Analysis (Parallel)
 
 8. **Compare src/* AND tests/* against specs/* with parallel subagents** (subagent mode only):
@@ -347,10 +357,9 @@ IMPLEMENTATION_PLAN.md should include TDD requirements for each task:
 ---
 
 ## Verification
-Commands from AGENTS.md:
-- `pytest tests/` - Run all tests
-- `npm run test` - Run test suite
-- `ruff check .` - Linting
+- `pytest tests/` - (from pyproject.toml)
+- `ruff check .` - (from AGENTS.md)
+- `npm test` - (from package.json)
 
 ## Test Coverage
 - Current coverage: X%
@@ -399,6 +408,7 @@ Commands from AGENTS.md:
 - Order task sections: RED (tests) → GREEN (implementation) → REFACTOR (quality)
 - Check test coverage gaps alongside implementation gaps
 - Update IMPLEMENTATION_PLAN.md with findings
+- Include `## Verification` section with auto-discovered commands from project config (with source annotation)
 
 ## Error Handling
 

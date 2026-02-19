@@ -17,7 +17,8 @@
       "enabled": true,
       "require_verification": true,
       "require_tests_pass": true,
-      "require_plan_check": true
+      "require_plan_check": true,
+      "verification_commands": []
     },
     "file_protection": {
       "enabled": true,

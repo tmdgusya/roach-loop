@@ -79,6 +79,68 @@ EXIT_CODE=$?
 set -e
 assert_exit_code "allows normal bash" "0" "$EXIT_CODE"
 
+# Test 4: ralph:verify-complete sets tests_run=true
+cat > "$TMPDIR/.harness/state.json" << 'EOF'
+{
+  "discovered_verification_commands": [],
+  "verification_status": {
+    "tests_run": false,
+    "tests_passed": false
+  }
+}
+EOF
+
+INPUT_MARKER=$(jq -n '{
+  tool_name: "Bash",
+  tool_input: { command: "echo '\''ralph:verify-complete'\''" },
+  cwd: "'"$TMPDIR"'",
+  hook_event_name: "PreToolUse"
+}')
+
+set +e
+echo "$INPUT_MARKER" | bash "$SCRIPT_DIR/pre-tool-use.sh" > /dev/null 2>/dev/null
+set -e
+
+TESTS_RUN=$(jq -r '.verification_status.tests_run' "$TMPDIR/.harness/state.json")
+if [ "$TESTS_RUN" = "true" ]; then
+  echo "  PASS: ralph:verify-complete sets tests_run=true"
+  PASS=$((PASS + 1))
+else
+  echo "  FAIL: ralph:verify-complete should set tests_run=true (got: $TESTS_RUN)"
+  FAIL=$((FAIL + 1))
+fi
+
+# Test 5: Discovered command from state is recognized (sets tests_run=true)
+cat > "$TMPDIR/.harness/state.json" << 'EOF'
+{
+  "discovered_verification_commands": ["my-project-test --ci"],
+  "verification_status": {
+    "tests_run": false,
+    "tests_passed": false
+  }
+}
+EOF
+
+INPUT_DISCOVERED=$(jq -n '{
+  tool_name: "Bash",
+  tool_input: { command: "my-project-test --ci" },
+  cwd: "'"$TMPDIR"'",
+  hook_event_name: "PreToolUse"
+}')
+
+set +e
+echo "$INPUT_DISCOVERED" | bash "$SCRIPT_DIR/pre-tool-use.sh" > /dev/null 2>/dev/null
+set -e
+
+TESTS_RUN_DISC=$(jq -r '.verification_status.tests_run' "$TMPDIR/.harness/state.json")
+if [ "$TESTS_RUN_DISC" = "true" ]; then
+  echo "  PASS: discovered command sets tests_run=true"
+  PASS=$((PASS + 1))
+else
+  echo "  FAIL: discovered command should set tests_run=true (got: $TESTS_RUN_DISC)"
+  FAIL=$((FAIL + 1))
+fi
+
 echo ""
 echo "=== Results: $PASS passed, $FAIL failed ==="
 [ "$FAIL" -eq 0 ] && exit 0 || exit 1

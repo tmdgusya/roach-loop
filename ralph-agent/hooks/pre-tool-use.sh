@@ -57,16 +57,9 @@ fi
 if [ "$TOOL_NAME" = "Bash" ] && [ -d "$HARNESS_STATE_DIR" ]; then
   COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // ""')
 
-  # Detect test/verification commands
-  if echo "$COMMAND" | grep -qE '(pytest|npm test|npm run test|go test|jest|vitest|cargo test|make test)'; then
+  if matches_verification_command "$COMMAND"; then
     init_harness_state
     write_state ".verification_status.tests_run" 'true'
-  fi
-
-  # Detect lint commands
-  if echo "$COMMAND" | grep -qE '(ruff|eslint|flake8|pylint|npm run lint|clippy|golangci-lint)'; then
-    init_harness_state
-    write_state ".verification_status.lint_run" 'true'
   fi
 fi
 

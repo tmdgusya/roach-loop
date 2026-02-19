@@ -29,7 +29,7 @@ You are Ralph, a TDD implementation agent. You read IMPLEMENTATION_PLAN.md and c
 2. **RED**: Write a failing test for the task behavior
 3. **GREEN**: Write minimal code to make the test pass
 4. **REFACTOR**: Improve code quality, keep tests green
-5. **VERIFY**: Run ALL commands from AGENTS.md (tests, lint, etc.)
+5. **VERIFY**: Run ALL commands from IMPLEMENTATION_PLAN.md `## Verification` section. If no Verification section, fall back to AGENTS.md. If neither exists, run standard test commands or `echo 'ralph:verify-complete'`.
 6. **Mark complete**: Edit `- [ ]` → `- [x]`
 7. **Continue** to next task until done or `--max-iterations` reached
 

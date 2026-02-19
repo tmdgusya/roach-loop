@@ -7,7 +7,7 @@
 #
 # Injects:
 #   - Directory tree snapshot (depth-limited)
-#   - Verification commands from AGENTS.md
+#   - Discovered verification commands (from plan, AGENTS.md, project config)
 #   - Current task status from IMPLEMENTATION_PLAN.md
 #   - Previous session state (for resume)
 #   - Time budget constraints (if configured)
@@ -32,6 +32,12 @@ fi
 # Initialize harness state
 export HARNESS_STATE_DIR="${CWD}/.harness"
 init_harness_state
+
+# Discover verification commands from project config and persist to state
+DISCOVERED_CMDS=$(discover_verification_commands "$CWD")
+write_state ".discovered_verification_commands" "$DISCOVERED_CMDS"
+CMD_COUNT=$(echo "$DISCOVERED_CMDS" | jq 'length')
+[ "$CMD_COUNT" -gt 0 ] && write_state ".has_test_infra" 'true' || write_state ".has_test_infra" 'false'
 
 # Per-session state reset:
 # - edit-tracker: counts are per-session; reset prevents cross-session false positives
@@ -68,15 +74,13 @@ $TREE
 "
 fi
 
-# 2. Verification Commands from AGENTS.md
-if [ -f "$CWD/AGENTS.md" ]; then
-  VERIFY_CMDS=$(grep -E '^\s*-\s*`[^`]+`' "$CWD/AGENTS.md" 2>/dev/null | head -20 || true)
-  if [ -n "$VERIFY_CMDS" ]; then
-    CONTEXT+="## Verification Commands (from AGENTS.md)
-$VERIFY_CMDS
+# 2. Discovered Verification Commands
+if [ -n "$DISCOVERED_CMDS" ] && [ "$DISCOVERED_CMDS" != "[]" ]; then
+  CMD_LIST=$(echo "$DISCOVERED_CMDS" | jq -r '.[] | "- `\(.)`"')
+  CONTEXT+="## Verification Commands
+$CMD_LIST
 
 "
-  fi
 fi
 
 # 3. Task Status from IMPLEMENTATION_PLAN.md

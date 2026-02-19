@@ -27,8 +27,8 @@ if [ -f "$SCRIPT_DIR/hooks.json" ]; then
   jq empty "$SCRIPT_DIR/hooks.json" 2>/dev/null
   assert_eq "hooks.json is valid JSON" "0" "$?"
 
-  # Check all events are registered
-  EVENTS=$(jq -r 'keys[]' "$SCRIPT_DIR/hooks.json" 2>/dev/null)
+  # Check all events are registered (hooks.json has a top-level "hooks" key)
+  EVENTS=$(jq -r '.hooks | keys[]' "$SCRIPT_DIR/hooks.json" 2>/dev/null)
   for event in SessionStart PreToolUse PostToolUse Stop PreCompact; do
     if echo "$EVENTS" | grep -q "$event"; then
       echo "  PASS: $event registered"
