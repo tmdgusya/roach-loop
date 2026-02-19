@@ -1,0 +1,19 @@
+{
+  "session_id": null,
+  "started_at": null,
+  "phase": "idle",
+  "current_task": null,
+  "tasks_completed": 0,
+  "tasks_remaining": 0,
+  "iteration": 0,
+  "verification_status": {
+    "tests_run": false,
+    "tests_passed": false,
+    "lint_run": false,
+    "lint_passed": false,
+    "last_verified_at": null
+  },
+  "tdd_phase": null,
+  "context_injected": false,
+  "last_compacted_at": null
+}

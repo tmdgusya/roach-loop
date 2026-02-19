@@ -1,0 +1,43 @@
+{
+  "version": "1.0.0",
+  "middleware": {
+    "context_injection": {
+      "enabled": true,
+      "inject_dir_tree": true,
+      "inject_tools": true,
+      "max_tree_depth": 3,
+      "time_budget_seconds": 0
+    },
+    "loop_detection": {
+      "enabled": true,
+      "edit_threshold": 5,
+      "reset_on_new_task": true
+    },
+    "pre_completion_checklist": {
+      "enabled": true,
+      "require_verification": true,
+      "require_tests_pass": true,
+      "require_plan_check": true
+    },
+    "file_protection": {
+      "enabled": true,
+      "protected_patterns": [
+        ".env",
+        ".env.*",
+        "*.pem",
+        "*.key",
+        "credentials.*"
+      ]
+    },
+    "trace_logging": {
+      "enabled": true,
+      "log_tool_calls": true,
+      "log_file_edits": true,
+      "max_log_size_mb": 10
+    }
+  },
+  "state": {
+    "format": "json",
+    "dir": ".harness"
+  }
+}
