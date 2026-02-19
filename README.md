@@ -29,19 +29,17 @@ To update:
 
 ## Quick Start
 
-Two workflows are available. Pick the one that fits your situation.
+Three steps: **create a plan → set up verification → execute**. Each step has options you can mix and match.
 
-### Ralph Workflow — Write your own task list and execute
+### Step 1: Create a Plan
 
-You write the task list manually. Ralph implements each task in order. You handle Git yourself.
+Choose one:
 
-**Step 1: Create the plan file**
+**Option A: Write tasks manually**
 
 ```bash
 /ralph-agent:ralph-init
 ```
-
-**Step 2: Write your tasks**
 
 Open `IMPLEMENTATION_PLAN.md` and fill in tasks:
 
@@ -55,35 +53,9 @@ Open `IMPLEMENTATION_PLAN.md` and fill in tasks:
 - [ ] Write pytest tests for all endpoints
 ```
 
-**Step 3: Set up verification commands**
+**Option B: Auto-generate from specs**
 
-Create `AGENTS.md` in your project root:
-
-```markdown
-# Verification Commands
-- `pytest tests/ -v`
-- `ruff check .`
-```
-
-**Step 4: Run**
-
-```bash
-/ralph-agent:ralph
-```
-
-Ralph finds the first unchecked task (`- [ ]`), implements it, runs all verification commands, and marks it `- [x]` when they pass. Then moves to the next task.
-
-### Geoff Workflow — Auto-generate plan from specs + Git management
-
-Write requirements in a `specs/` directory. Geoff generates the plan automatically and handles Git commits and version tags.
-
-**Step 1: Write specs**
-
-```bash
-mkdir specs
-```
-
-Create requirement files in `specs/`:
+Create a `specs/` directory with requirement files:
 
 ```markdown
 # specs/user-auth.md
@@ -96,30 +68,50 @@ Create requirement files in `specs/`:
 - Passwords are hashed with bcrypt
 ```
 
-**Step 2: Generate the plan**
+Then generate the plan:
 
 ```bash
 /ralph-agent:gplan
 ```
 
-Analyzes your specs and generates `IMPLEMENTATION_PLAN.md` automatically.
+This analyzes your specs and creates `IMPLEMENTATION_PLAN.md` automatically. You can review and edit it before running.
 
-**Step 3: Build**
+### Step 2: Set Up Verification
+
+Create `AGENTS.md` in your project root:
+
+```markdown
+# Verification Commands
+- `pytest tests/ -v`
+- `ruff check .`
+```
+
+The agent runs these after each task. All must pass before a task is marked complete.
+
+### Step 3: Execute
+
+Choose one:
 
 ```bash
+# Execute tasks, no Git management (you commit manually)
+/ralph-agent:ralph
+
+# Execute tasks + automatic git commit → push → tag (0.0.0, 0.0.1, ...)
 /ralph-agent:gbuild
 ```
 
-Implements each task, runs tests, then automatically `git commit → push → tag (0.0.0, 0.0.1, ...)`.
+Both find the first unchecked task (`- [ ]`), implement it, run verification, mark it `- [x]`, and move to the next. The only difference is whether Git is handled automatically.
 
-### Which workflow should I use?
+### Combining freely
 
-| Situation | Recommended | Commands |
-|-----------|-------------|----------|
-| I want to manage my own task list | Ralph | `/ralph-agent:ralph-init` → `/ralph-agent:ralph` |
-| I want to handle Git commits myself | Ralph | `/ralph-agent:ralph` |
-| I have spec documents and want auto-planning | Geoff | `/ralph-agent:gplan` → `/ralph-agent:gbuild` |
-| I want automatic Git commits + version tags | Geoff | `/ralph-agent:gplan` → `/ralph-agent:gbuild` |
+Plan creation and execution are independent — mix however you like:
+
+| Plan | Execute | Use when |
+|------|---------|----------|
+| `gplan` (auto) | `ralph` | Specs exist, but you handle Git yourself |
+| `gplan` (auto) | `gbuild` | Specs exist, want full automation |
+| `ralph-init` (manual) | `ralph` | Simple task list, manual Git |
+| `ralph-init` (manual) | `gbuild` | Simple task list, want auto Git |
 
 ## Practical Tips
 

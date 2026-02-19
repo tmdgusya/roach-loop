@@ -29,19 +29,17 @@ Claude Code에서 두 명령어를 실행한다:
 
 ## 빠른 시작
 
-두 가지 워크플로우가 있다. 상황에 맞는 걸 고르면 된다.
+세 단계로 진행한다: **계획 만들기 → 검증 설정 → 실행**. 각 단계에서 옵션을 자유롭게 조합할 수 있다.
 
-### Ralph 워크플로우 — 직접 태스크 목록을 만들어 실행
+### 1단계: 계획 만들기
 
-태스크 목록을 직접 작성하고, Ralph가 순서대로 구현한다. Git은 직접 관리한다.
+둘 중 하나를 선택한다:
 
-**1단계: 계획 파일 생성**
+**방법 A: 직접 태스크 작성**
 
 ```bash
 /ralph-agent:ralph-init
 ```
-
-**2단계: 태스크 작성**
 
 생성된 `IMPLEMENTATION_PLAN.md`를 열고 태스크를 채운다:
 
@@ -55,35 +53,9 @@ Claude Code에서 두 명령어를 실행한다:
 - [ ] 전체 엔드포인트 pytest 테스트 작성
 ```
 
-**3단계: 검증 명령어 설정**
+**방법 B: 스펙에서 자동 생성**
 
-프로젝트 루트에 `AGENTS.md`를 만든다:
-
-```markdown
-# Verification Commands
-- `pytest tests/ -v`
-- `ruff check .`
-```
-
-**4단계: 실행**
-
-```bash
-/ralph-agent:ralph
-```
-
-Ralph가 첫 번째 미완료 태스크(`- [ ]`)부터 구현을 시작한다. 각 태스크마다 검증 명령어를 실행하고, 통과하면 `- [x]`로 표시한 뒤 다음 태스크로 넘어간다.
-
-### Geoff 워크플로우 — 스펙에서 자동 계획 + Git 관리
-
-`specs/` 디렉토리에 요구사항을 작성하면, 계획을 자동 생성하고 Git 커밋/태그까지 해준다.
-
-**1단계: 스펙 작성**
-
-```bash
-mkdir specs
-```
-
-`specs/` 안에 요구사항 파일을 만든다:
+`specs/` 디렉토리에 요구사항 파일을 만든다:
 
 ```markdown
 # specs/user-auth.md
@@ -96,30 +68,50 @@ mkdir specs
 - 비밀번호는 bcrypt로 해싱
 ```
 
-**2단계: 계획 생성**
+그 다음 계획을 생성한다:
 
 ```bash
 /ralph-agent:gplan
 ```
 
-스펙을 분석해서 `IMPLEMENTATION_PLAN.md`를 자동 생성한다.
+스펙을 분석해서 `IMPLEMENTATION_PLAN.md`를 자동 생성한다. 실행 전에 내용을 확인하고 수정할 수 있다.
 
-**3단계: 빌드**
+### 2단계: 검증 설정
+
+프로젝트 루트에 `AGENTS.md`를 만든다:
+
+```markdown
+# Verification Commands
+- `pytest tests/ -v`
+- `ruff check .`
+```
+
+에이전트가 매 태스크 완료 후 이 명령어들을 실행한다. 모두 통과해야 태스크가 완료 처리된다.
+
+### 3단계: 실행
+
+둘 중 하나를 선택한다:
 
 ```bash
+# 태스크 실행, Git은 직접 관리
+/ralph-agent:ralph
+
+# 태스크 실행 + 자동 git commit → push → tag (0.0.0, 0.0.1, ...)
 /ralph-agent:gbuild
 ```
 
-태스크를 구현하고, 테스트 통과 후 자동으로 `git commit → push → tag (0.0.0, 0.0.1, ...)`까지 처리한다.
+둘 다 첫 번째 미완료 태스크(`- [ ]`)를 찾아 구현하고, 검증을 돌리고, `- [x]`로 표시한 뒤 다음으로 넘어간다. 차이는 Git 자동 관리 여부뿐이다.
 
-### 어떤 워크플로우를 쓸까?
+### 자유롭게 조합 가능
 
-| 상황 | 추천 | 명령어 |
-|------|------|--------|
-| 직접 태스크 목록을 관리하고 싶다 | Ralph | `/ralph-agent:ralph-init` → `/ralph-agent:ralph` |
-| Git 커밋을 직접 하고 싶다 | Ralph | `/ralph-agent:ralph` |
-| 스펙 문서가 있고 자동 계획이 필요하다 | Geoff | `/ralph-agent:gplan` → `/ralph-agent:gbuild` |
-| 자동 Git 커밋 + 버전 태그가 필요하다 | Geoff | `/ralph-agent:gplan` → `/ralph-agent:gbuild` |
+계획 생성과 실행은 독립적이다. 원하는 대로 조합하면 된다:
+
+| 계획 | 실행 | 상황 |
+|------|------|------|
+| `gplan` (자동) | `ralph` | 스펙은 있지만 Git은 직접 관리 |
+| `gplan` (자동) | `gbuild` | 스펙 있고, 전부 자동화 |
+| `ralph-init` (수동) | `ralph` | 직접 태스크 작성, Git 직접 관리 |
+| `ralph-init` (수동) | `gbuild` | 직접 태스크 작성, Git은 자동 |
 
 ## 실전 사용 팁
 
