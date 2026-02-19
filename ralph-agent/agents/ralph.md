@@ -112,9 +112,10 @@ If conditions are not met, fall back to sequential execution.
    ```
 
 5. **Spawn builder teammates** (one per task or a few tasks each):
+   Before spawning, check `.claude/agents/` and `~/.claude/agents/` for a suitable builder agent (e.g., `executor`, `builder`, `implementer`). Fall back to `general-purpose` if none fits.
    ```
    Task(
-     subagent_type="general-purpose",
+     subagent_type="<best match from available agents — e.g. executor, builder — fallback: general-purpose>",
      team_name="ralph-impl",
      name="builder-1",
      model="inherit",

@@ -87,6 +87,14 @@ You use the Task tool to spawn parallel subagents for analysis. The number of pa
 - Coverage: Each subagent focuses on one spec/file
 - Scalability: Can use 10, 50, 100, or even 250+ subagents depending on project size
 
+**Choosing a subagent type:**
+Before spawning any subagent, check `.claude/agents/` (project-level) and `~/.claude/agents/` (user-level) for available agents. Pick the most appropriate one for the task at hand — the user's repository may have specialized agents that are better suited than the built-in fallback. If no suitable agent exists, fall back to `general-purpose`.
+
+Examples:
+- Spec analysis → look for agents named `analyzer`, `spec-reader`, `researcher`, or similar
+- Gap analysis / code search → look for agents named `explorer`, `searcher`, or similar
+- If none match → use `general-purpose` with model `sonnet`
+
 ## Team Mode Strategy (when `--team` or `--parallel >= 10`)
 
 Use [Claude Code Agent Teams](https://code.claude.com/docs/en/agent-teams) when specs are numerous or likely to have cross-references. Unlike subagents (which report back independently), **team analysts can message each other directly** to surface inter-spec dependencies during live analysis.
@@ -130,7 +138,7 @@ Use [Claude Code Agent Teams](https://code.claude.com/docs/en/agent-teams) when 
 3. **Spawn analyst teammates** (up to `--parallel` count, minimum 2):
    ```
    Task(
-     subagent_type="general-purpose",
+     subagent_type="<best match from .claude/agents/ or ~/.claude/agents/ — e.g. analyzer, spec-reader, researcher — fallback: general-purpose>",
      team_name="gplan-analysis",
      name="analyst-1",
      model="sonnet",
@@ -185,7 +193,7 @@ Use [Claude Code Agent Teams](https://code.claude.com/docs/en/agent-teams) when 
      - Dependencies
      - Acceptance criteria
      - Technical constraints
-   - Use `subagent_type: "general-purpose"` with model `sonnet`
+   - **Pick the most appropriate `subagent_type`** from `.claude/agents/` or `~/.claude/agents/` (e.g., `analyzer`, `spec-reader`, `researcher`). Fall back to `general-purpose` if none fits.
    - Run up to the parallel limit concurrently
 
 4. **Collect and synthesize spec analysis:**

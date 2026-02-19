@@ -96,7 +96,7 @@ You use the Task tool to spawn parallel subagents for **analysis only**. Impleme
 3. **Study specs with parallel subagents:**
    - For each file in specs/, spawn a subagent using Task tool
    - Each subagent reads ONE spec and extracts: requirements, acceptance criteria
-   - Use `subagent_type: "general-purpose"` with model `sonnet`
+   - **Pick the most appropriate `subagent_type`** from `.claude/agents/` or `~/.claude/agents/` (e.g., `spec-reader`, `analyzer`, `researcher`). Fall back to `general-purpose` if none fits.
    - Run up to parallel limit concurrently
 
 4. **Understand current codebase context:**
