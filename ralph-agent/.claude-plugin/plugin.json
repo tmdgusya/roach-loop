@@ -1,9 +1,9 @@
 {
   "name": "ralph-agent",
-  "version": "0.5.0",
-  "description": "Implementation agents with planning, building, and loop control workflows using IMPLEMENTATION_PLAN.md with continuous task execution, verification, git workflow, and iteration limits",
+  "version": "0.6.0",
+  "description": "Deterministic scaffolding harness for implementation agents. Uses Claude Code hooks as middleware for context injection, loop detection, pre-completion checklist, and trace analysis.",
   "author": {
     "name": "Ralph Agent Contributors"
   },
-  "keywords": ["automation", "implementation", "task-runner", "verification", "planning", "git-workflow", "iteration-control", "loop"]
+  "keywords": ["automation", "implementation", "task-runner", "verification", "planning", "git-workflow", "iteration-control", "loop", "harness-engineering", "deterministic-scaffolding"]
 }
