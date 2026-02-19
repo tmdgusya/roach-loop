@@ -22,6 +22,10 @@ env/
 # Testing
 .pytest_cache/
 
+# Runtime state
+.harness/
+.omc/
+
 # Project specific
 archive.txt
 IMPLEMENTATION_SUMMARY.md

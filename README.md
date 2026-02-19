@@ -583,38 +583,186 @@ Ralph will:
 - **IMPLEMENTATION_PLAN.md**: Must exist in the current directory
 - **AGENTS.md**: Should contain verification commands (optional but recommended)
 
-## Example Workflow
+## Practical Usage Guide
+
+A step-by-step walkthrough of actually using this plugin, from zero to completed tasks.
+
+### Step 1: Initialize the Plan
 
 ```bash
-# Create initial plan
 /ralph-agent:ralph-init
+```
 
-# Edit the plan with your tasks
-# Edit AGENTS.md with verification commands
+This creates `IMPLEMENTATION_PLAN.md` with a template. Open it and replace the placeholder tasks with your own:
 
-# Start Ralph
+```markdown
+# Implementation Plan
+
+## Description
+Build a REST API for user management.
+
+## Tasks
+- [ ] Create User model with SQLAlchemy (id, email, name, created_at)
+- [ ] Implement POST /users endpoint with input validation
+- [ ] Implement GET /users/:id endpoint with 404 handling
+- [ ] Add pytest test suite for all endpoints
+- [ ] Add ruff linting configuration
+```
+
+Keep tasks specific and independently verifiable. Each task should produce a testable outcome.
+
+### Step 2: Set Up Verification Commands
+
+Create `AGENTS.md` in your project root:
+
+```markdown
+# Verification Commands
+- `pytest tests/ -v`
+- `ruff check .`
+```
+
+These are the commands Ralph runs after each task to confirm it works. The harness tracks whether these have been executed and whether they passed — **Ralph cannot stop until all verification passes**.
+
+### Step 3: (Optional) Tune the Harness
+
+The defaults work well for most projects. But if you need to adjust, edit `harness.json` inside the plugin directory. The location depends on how you installed:
+
+| Installation Method | Path |
+|---|---|
+| Marketplace | `~/.claude/plugins/cache/*/ralph-agent/*/harness/harness.json` |
+| Global manual | `~/.claude/plugins/ralph-agent/harness/harness.json` |
+| Project local | `.claude-plugin/ralph-agent/harness/harness.json` |
+
+Example changes:
+
+```jsonc
+// Lower the loop threshold for tight files (default: 5)
+"edit_threshold": 3
+
+// Add a time budget for each session (default: 0 = no limit)
+"time_budget_seconds": 1800
+
+// Disable file protection if you need to write .env
+"file_protection": { "enabled": false }
+```
+
+### Step 4: Start Ralph
+
+```bash
 /ralph-agent:ralph
+```
 
-# Ralph output:
-✓ Task completed: Task 1: Create database models
-  - Files modified: models.py
+Ralph reads `IMPLEMENTATION_PLAN.md`, finds the first `- [ ]` task, and starts working. Behind the scenes, the harness is active:
+
+```
+Session starts
+  └─ SessionStart hook fires
+       └─ Injects: directory tree, verification commands, task status
+           └─ Agent begins Task 1
+
+Agent edits src/models.py
+  └─ PreToolUse hook: checks file protection (allowed)
+  └─ PostToolUse hook: logs to trace, increments edit count (1/5)
+
+Agent edits src/models.py again
+  └─ PostToolUse hook: edit count now 2/5 (still fine)
+
+Agent runs: pytest tests/ -v
+  └─ PreToolUse hook: records tests_run = true
+  └─ PostToolUse hook: records tests_passed = true
+
+Agent marks Task 1 complete: - [ ] → - [x]
+  └─ Moves to Task 2 automatically
+```
+
+### Step 5: Let Ralph Work
+
+Ralph will work through all tasks continuously. You'll see output like:
+
+```
+✓ Task completed: Create User model with SQLAlchemy
+  - Files modified: src/models.py
   - Verification: PASSED
-  - Next task: Task 2: Implement API endpoints
+  - Next task: Implement POST /users endpoint
 
-✓ Task completed: Task 2: Implement API endpoints
-  - Files modified: api.py
+✓ Task completed: Implement POST /users endpoint
+  - Files modified: src/api.py, tests/test_users.py
   - Verification: PASSED
-  - Next task: Task 3: Write unit tests
+  - Next task: Implement GET /users/:id endpoint
+```
 
+If Ralph gets stuck editing the same file repeatedly, the loop detection hook kicks in:
+
+```
+⚠ LOOP DETECTION WARNING: You have edited 'src/api.py' 5 times.
+  STOP and reconsider your approach...
+```
+
+### Step 6: Completion
+
+When all tasks are checked off and verification passes, Ralph reports:
+
+```
 ╔══════════════════════════════════════════╗
 ║   ALL TASKS COMPLETED SUCCESSFULLY ✓    ║
 ╚══════════════════════════════════════════╝
 
 Summary:
-- Total tasks: 3
-- Completed: 3
+- Total tasks: 5
+- Completed: 5
 - Verification: All passed
 ```
+
+If Ralph tries to stop before verification passes, the Stop hook blocks it:
+
+```
+PRECOMPLETION CHECKLIST FAILED - You cannot stop yet.
+Blockers:
+- Verification tests have NOT been run.
+```
+
+### Step 7: Post-Session Analysis
+
+After Ralph finishes, review the trace log in `.harness/trace-log.jsonl`. The plugin includes a trace analysis script you can run:
+
+```bash
+# Find and run the analysis script from the plugin directory
+# (The exact path depends on your installation method)
+bash "$(find ~/.claude/plugins -name analyze-trace.sh 2>/dev/null | head -1)" .harness/trace-log.jsonl
+```
+
+Or use `jq` directly for a quick summary:
+
+```bash
+# Tool usage breakdown
+jq -r '.tool' .harness/trace-log.jsonl | sort | uniq -c | sort -rn
+
+# Hot files (most-edited)
+jq -r 'select(.tool == "Edit" or .tool == "Write") | .input.file_path' .harness/trace-log.jsonl | sort | uniq -c | sort -rn
+```
+
+This tells you how many tool calls were made, which files were edited most, and whether any doom loops occurred. Use this to refine your task granularity or harness settings for next time.
+
+### For Geoff's Workflow
+
+The same harness applies when using Geoff. The only difference is the setup:
+
+```bash
+# 1. Write specs (instead of a manual plan)
+mkdir specs
+# Create specs/user-api.md with requirements
+
+# 2. Generate the plan from specs
+/ralph-agent:gplan
+
+# 3. Review the generated IMPLEMENTATION_PLAN.md
+
+# 4. Build with git workflow
+/ralph-agent:gbuild
+# (auto-commits, pushes, and tags each completed task)
+```
+
+The hooks enforce the same rules: loop detection, file protection, verification gating, and context preservation all work identically regardless of which agent is driving.
 
 ## Components
 
@@ -666,6 +814,21 @@ ralph-agent/
 │   ├── gplan.md             # /ralph-agent:gplan command
 │   ├── gbuild.md            # /ralph-agent:gbuild command
 │   └── loop.md              # /ralph-agent:loop wrapper command
+├── harness/
+│   ├── harness.json         # Middleware configuration
+│   └── templates/
+│       └── state.json.template  # Initial state template
+├── hooks/
+│   ├── hooks.json           # Hook event registrations
+│   ├── session-start.sh     # Context injection (SessionStart)
+│   ├── pre-tool-use.sh      # File protection + tracking (PreToolUse)
+│   ├── post-tool-use.sh     # Loop detection + tracing (PostToolUse)
+│   ├── stop-checklist.sh    # Completion gate (Stop)
+│   ├── pre-compact.sh       # State preservation (PreCompact)
+│   └── lib/
+│       ├── config.sh        # Shared config loader
+│       ├── state.sh         # State management functions
+│       └── analyze-trace.sh # Post-session trace analysis
 ├── skills/
 │   └── implementation-plan/
 │       ├── SKILL.md         # Main skill file
@@ -681,6 +844,246 @@ ralph-agent/
 ├── README.md
 └── .gitignore
 ```
+
+## Deterministic Scaffolding Harness
+
+Beyond the agent workflows, this plugin includes a **hook-based harness** that enforces reliability constraints on any agent running inside it. The harness uses [Claude Code hooks](https://docs.anthropic.com/en/docs/claude-code/hooks) as middleware — intercepting tool calls, injecting context, and gating completion — so the agent stays on track without relying on prompt discipline alone.
+
+### Why a Harness?
+
+Agents fail in predictable ways: they lose context after compaction, get stuck editing the same file in a loop, skip verification, or write to sensitive files. The harness addresses each of these with a dedicated hook:
+
+| Failure Mode | Hook | Enforcement |
+|---|---|---|
+| Agent explores instead of working | `SessionStart` | Injects pre-built environment map so the agent starts with context |
+| Doom loop (same file edited repeatedly) | `PostToolUse` | Tracks per-file edit counts; triggers strategy reconsideration at threshold |
+| Writes to secrets/credentials | `PreToolUse` | Blocks writes to `.env`, `*.pem`, `*.key`, `credentials.*` |
+| Stops without verifying | `Stop` | Blocks the agent from stopping until verification commands pass |
+| Loses state after context compaction | `PreCompact` | Re-injects phase, task progress, and verification commands |
+
+### Hook Events
+
+#### SessionStart — Context Injection
+
+**Script:** `hooks/session-start.sh`
+
+When a session starts, this hook injects a pre-built context snapshot so the agent doesn't waste time exploring:
+
+- **Project structure**: Depth-limited directory tree (excludes `node_modules`, `.git`, etc.)
+- **Verification commands**: Extracted from `AGENTS.md`
+- **Task status**: Total/completed/remaining counts and next task from `IMPLEMENTATION_PLAN.md`
+- **Resume state**: If resuming a previous session, injects the previous phase and task
+- **Time budget**: Optional time constraint (if configured in `harness.json`)
+- **Harness rules**: Summary of active enforcement rules
+
+The design principle is **"Context Injection > Context Discovery"** — instead of letting the agent discover its environment through tool calls, inject a complete map upfront.
+
+#### PreToolUse — File Protection & Verification Tracking
+
+**Script:** `hooks/pre-tool-use.sh`
+**Triggers on:** `Write`, `Edit`, `Bash`
+
+Two responsibilities:
+
+1. **File protection**: Blocks writes to sensitive files matching protected patterns. If the agent attempts to write to `.env`, `*.pem`, `*.key`, or `credentials.*`, the hook returns a `deny` decision with a reason.
+
+2. **Verification tracking**: When a Bash command matches known test patterns (`pytest`, `npm test`, `jest`, `vitest`, etc.) or lint patterns (`ruff`, `eslint`, `flake8`, etc.), the hook records that verification was *attempted* in the harness state.
+
+#### PostToolUse — Loop Detection & Trace Logging
+
+**Script:** `hooks/post-tool-use.sh`
+**Triggers on:** `Edit`, `Write`, `Bash`
+
+Three responsibilities:
+
+1. **Trace logging**: Every tool call is appended to `trace-log.jsonl` with timestamp, tool name, and input. This enables post-session analysis.
+
+2. **Loop detection**: For `Edit` and `Write` tools, increments a per-file edit counter. When the count reaches the threshold (default: 5), injects a warning prompt:
+   > *"You have edited 'file.py' 5 times. STOP and reconsider your approach..."*
+
+   The warning suggests: re-read the error, try a different strategy, check a different file, or look at dependencies.
+
+3. **Verification result tracking**: When a Bash command succeeds and matches test/lint patterns, records that verification *passed* in the harness state.
+
+#### Stop — Pre-Completion Checklist
+
+**Script:** `hooks/stop-checklist.sh`
+
+Intercepts the agent's attempt to stop and checks two conditions:
+
+1. **Verification ran and passed**: Were test commands executed? Did they succeed?
+2. **No remaining tasks**: Are there unchecked tasks (`- [ ]`) in `IMPLEMENTATION_PLAN.md`?
+
+If either condition fails, the hook **blocks the stop** (exit code 2) and returns a checklist of blockers. The agent must address all blockers before it can stop.
+
+A `stop_hook_active` guard prevents infinite loops — if the stop hook already fired once and the agent is retrying, it lets the stop through.
+
+#### PreCompact — Context Preservation
+
+**Script:** `hooks/pre-compact.sh`
+
+When Claude Code compacts the conversation to stay within context limits, critical state can be lost. This hook re-injects:
+
+- Current phase and task
+- Progress counts (completed/remaining)
+- Iteration number and TDD phase
+- Verification commands from `AGENTS.md`
+- An instruction to continue from the current position (not restart)
+
+### Configuration: `harness.json`
+
+All middleware modules are configured in `harness/harness.json`:
+
+```json
+{
+  "version": "1.0.0",
+  "middleware": {
+    "context_injection": {
+      "enabled": true,
+      "inject_dir_tree": true,
+      "inject_tools": true,
+      "max_tree_depth": 3,
+      "time_budget_seconds": 0
+    },
+    "loop_detection": {
+      "enabled": true,
+      "edit_threshold": 5,
+      "reset_on_new_task": true
+    },
+    "pre_completion_checklist": {
+      "enabled": true,
+      "require_verification": true,
+      "require_tests_pass": true,
+      "require_plan_check": true
+    },
+    "file_protection": {
+      "enabled": true,
+      "protected_patterns": [
+        ".env", ".env.*", "*.pem", "*.key", "credentials.*"
+      ]
+    },
+    "trace_logging": {
+      "enabled": true,
+      "log_tool_calls": true,
+      "log_file_edits": true,
+      "max_log_size_mb": 10
+    }
+  },
+  "state": {
+    "format": "json",
+    "dir": ".harness"
+  }
+}
+```
+
+Each middleware module can be independently enabled or disabled. Key settings:
+
+| Setting | Default | Description |
+|---|---|---|
+| `loop_detection.edit_threshold` | `5` | Number of edits to the same file before triggering a warning |
+| `context_injection.max_tree_depth` | `3` | Directory tree depth for the session-start context |
+| `context_injection.time_budget_seconds` | `0` | Time constraint injected into context (0 = no limit) |
+| `file_protection.protected_patterns` | See above | File patterns that cannot be written to |
+| `trace_logging.max_log_size_mb` | `10` | Maximum trace log file size |
+
+### Runtime State: `.harness/`
+
+The harness creates a `.harness/` directory in your project root to track state across tool calls:
+
+```
+.harness/
+├── state.json          # Session phase, verification status, task progress
+├── edit-tracker.json   # Per-file edit counts for loop detection
+└── trace-log.jsonl     # Chronological log of all tool calls
+```
+
+**`state.json`** tracks the agent's current position:
+```json
+{
+  "session_id": "abc-123",
+  "started_at": "2026-02-19T10:00:00Z",
+  "phase": "executing",
+  "current_task": "Implement API endpoints",
+  "tasks_completed": 2,
+  "tasks_remaining": 5,
+  "iteration": 3,
+  "verification_status": {
+    "tests_run": true,
+    "tests_passed": true,
+    "lint_run": true,
+    "lint_passed": true,
+    "last_verified_at": "2026-02-19T10:45:00Z"
+  },
+  "tdd_phase": null,
+  "context_injected": true,
+  "last_compacted_at": null
+}
+```
+
+**`edit-tracker.json`** maps file paths to edit counts:
+```json
+{
+  "src/api.py": 3,
+  "src/models.py": 1
+}
+```
+
+**`trace-log.jsonl`** records every tool call as a JSON line:
+```json
+{"timestamp":"2026-02-19T10:30:00Z","tool":"Edit","input":{"file_path":"src/api.py"},"result":"success"}
+{"timestamp":"2026-02-19T10:30:05Z","tool":"Bash","input":{"command":"pytest tests/"},"result":"success"}
+```
+
+### Trace Analysis
+
+After a session completes, you can analyze the trace log in `.harness/trace-log.jsonl` to identify patterns and potential improvements. The plugin includes a trace analysis script:
+
+```bash
+# Find and run the analysis script from the plugin directory
+bash "$(find ~/.claude/plugins -name analyze-trace.sh 2>/dev/null | head -1)" .harness/trace-log.jsonl
+
+# Or use jq directly for a quick summary:
+jq -r '.tool' .harness/trace-log.jsonl | sort | uniq -c | sort -rn
+```
+
+This produces a report including:
+
+- **Tool usage breakdown**: How many calls to each tool (Edit, Bash, Read, etc.)
+- **Hot files**: Files edited most frequently, with loop warnings for files at or above threshold
+- **Loop analysis**: Whether any doom loops were detected
+- **Verification runs**: Which verification commands were executed and how many times
+
+Example output:
+```
+═══════════════════════════════════════════
+  TRACE ANALYSIS REPORT
+═══════════════════════════════════════════
+
+Total tool calls: 47
+
+── Tool Usage ──────────────────────────────
+  Edit: 18 calls (38%)
+  Bash: 12 calls (25%)
+  Read: 10 calls (21%)
+  Write: 4 calls (8%)
+  Glob: 3 calls (6%)
+
+── Hot Files (Edit/Write frequency) ────────
+  src/api.py: 6 edits ⚠ POTENTIAL LOOP
+  src/models.py: 3 edits
+
+── Loop Analysis ───────────────────────────
+  WARNING: Potential doom loops detected on:
+    - src/api.py
+
+── Verification Runs ───────────────────────
+  pytest tests/: 4 runs
+  ruff check .: 2 runs
+
+═══════════════════════════════════════════
+```
+
+Use this data to tune `harness.json` (e.g., adjust `edit_threshold`) or to identify where agents struggle in your codebase.
 
 ## Best Practices
 
